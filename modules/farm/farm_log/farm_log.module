@@ -156,6 +156,109 @@ function farm_log_entity_presave($entity, $type) {
 }
 
 /**
+ * Implements hook_action_info().
+ */
+function farm_log_action_info() {
+  return array(
+    'farm_log_assign_action' => array(
+      'type' => 'log',
+      'label' => t('Assign'),
+      'configurable' => TRUE,
+      'triggers' => array('any'),
+    ),
+  );
+}
+
+/**
+ * Log assign action configuration form.
+ *
+ * @param array $context
+ *   The context passed into the action form function.
+ * @param array $form_state
+ *   The form state passed into the action form function.
+ *
+ * @return array
+ *   Returns a form array.
+ */
+function farm_log_assign_action_form(array $context, array $form_state) {
+  $form['users'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Assign log(s) to'),
+    '#description' => t('Enter the names of people to assign these logs to, separated by commas. Available options will be displayed as you type.'),
+    '#maxlength' => 1024,
+    '#autocomplete_path' => 'user/autocomplete',
+  );
+  /**
+   * @todo
+   * The 'user/autocomplete' path does not accept a comma-separated list.
+   */
+  return $form;
+}
+
+/**
+ * Log assign action configuration form validation.
+ *
+ * @param array $form
+ *   The form array.
+ * @param array $form_state
+ *   The form state array.
+ *
+ * @return array
+ *   Returns an array that will end up in the action's context.
+ */
+function farm_log_assign_action_validate(array $form, array $form_state) {
+
+  // Parse the list of users.
+  if (!empty($form_state['values']['users'])) {
+
+    // Explode the value into an array of names.
+    $names = drupal_explode_tags($form_state['values']['users']);
+
+    /**
+     * @todo
+     * Look up user IDs, save in $form_state['farm_log']['uids'].
+     * Or, throw validation errors if any of the names are invalid.
+     */
+    $form_state['farm_log']['uids'] = array();
+  }
+}
+
+/**
+ * Log assign action configuration form submit.
+ *
+ * @param array $form
+ *   The form array.
+ * @param array $form_state
+ *   The form state array.
+ *
+ * @return array
+ *   Returns an array that will end up in the action's context.
+ */
+function farm_log_assign_action_submit(array $form, array $form_state) {
+  return array(
+    'users' => $form_state['values']['uids'],
+  );
+}
+
+/**
+ * Action function for farm_log_assign_action.
+ *
+ * Assigns a log to one or more people.
+ *
+ * @param Log $log
+ *   The log entity object.
+ * @param array $context
+ *   Array with parameters for this action.
+ */
+function farm_log_assign_action(Log $log, $context = array()) {
+
+  /**
+   * @todo
+   * Perform the assignment and save the log.
+   */
+}
+
+/**
  * Helper function for creating log categories. Terms will only be added if
  * they don't already exist.
  *
